@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# Container tasks — invoked as `task docker:<name>`.
+version: '3'
+
+vars:
+  IMAGE: cdm-rag-chatbot:local
+
+tasks:
+  build:
+    desc: Build the API's Docker image
+    cmds:
+      - docker build -t {{.IMAGE}} .
+
+  run:
+    desc: Run the API in a container (expects a .env with the chosen LLM/vector DB adapter credentials)
+    deps: [build]
+    cmds:
+      - docker run --rm -p 8000:8000 --env-file .env {{.IMAGE}}

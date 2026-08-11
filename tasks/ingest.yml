@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# Offline ingestion pipeline tasks — invoked as `task ingest:<name>`.
+# Pipeline: Resolve -> Validate -> Canonical Model -> Projections.
+# See docs/adr/0002, 0007, 0012, 0014, 0015.
+version: '3'
+
+tasks:
+  run:
+    desc: Run the full offline ingestion pipeline against the CDM source
+    cmds:
+      - .venv/bin/python -m app.ingestion.run
+
+  clean:
+    desc: Clear the structured and semantic indexes without re-ingesting (idempotent rebuild target, ADR-0002)
+    cmds:
+      - .venv/bin/python -m app.ingestion.run --clean-only

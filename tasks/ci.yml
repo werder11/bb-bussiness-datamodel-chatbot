@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# CI/CD gate composition — invoked as `task ci:<name>`.
+# Mirrors the two gates defined in docs/adr/0019-cicd-pipeline-layered-by-cost-and-speed.md exactly,
+# so CI config and local dev call the same tasks (ADR-0020) with no drift between them.
+version: '3'
+
+tasks:
+  fast:
+    desc: "Fast gate (every push): lint, typecheck, all test levels, Docker build -- no LLM calls"
+    cmds:
+      - task: dev:lint
+      - task: test:all
+      - task: docker:build
+
+  slow:
+    desc: "Slow gate (on demand / pre-release): full ingestion + full evaluation dataset -- costs LLM calls"
+    cmds:
+      - task: ingest:run
+      - task: eval:run

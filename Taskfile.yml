@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# Root Taskfile — see docs/adr/0020-task-automation-modular-taskfiles.md
+# `task --list-all` is the single discoverable entry point for local dev and CI/CD alike.
+version: '3'
+
+includes:
+  dev: tasks/dev.yml
+  ingest: tasks/ingest.yml
+  test: tasks/test.yml
+  eval: tasks/eval.yml
+  docker: tasks/docker.yml
+  ci: tasks/ci.yml
+
+tasks:
+  default:
+    desc: List every available task across all namespaces
+    cmds:
+      - task --list-all

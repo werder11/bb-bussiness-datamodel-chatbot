@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# Testing tasks — invoked as `task test:<name>`.
+# Levels follow docs/adr/0018-testing-strategy-istqb-aligned.md.
+# All of these are the CI/CD fast gate (docs/adr/0019) — deterministic, no LLM calls.
+version: '3'
+
+tasks:
+  unit:
+    desc: "Component/Unit level: fake ports, no live services"
+    cmds:
+      - .venv/bin/pytest tests/unit -v
+
+  integration:
+    desc: "Component Integration level: Resolver golden tests against fixture .cdm.json files"
+    cmds:
+      - .venv/bin/pytest tests/integration -v
+
+  system:
+    desc: "System level: FastAPI TestClient against the real small corpus, deterministic paths only"
+    cmds:
+      - .venv/bin/pytest tests/system -v
+
+  acceptance:
+    desc: "Acceptance level: one test per functional requirement (FR1-FR7)"
+    cmds:
+      - .venv/bin/pytest tests/acceptance -v
+
+  all:
+    desc: "Run every test level (unit, integration, system, acceptance) -- not the full fast gate, see ci:fast for that"
+    cmds:
+      - task: unit
+      - task: integration
+      - task: system
+      - task: acceptance

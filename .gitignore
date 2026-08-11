@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.env
+*.db
+chroma_data/
+docs/eval-report.md
+
+# Reference clone of the external Microsoft CDM repo (its own git repo, not vendored)
+cdm-source/
+
+# Claude Code tooling/skills used to build this repo — not part of the deliverable source
+.claude/
+
+# Superseded working drafts, fully migrated into docs/ — kept locally, not in the deliverable repo
+temp/

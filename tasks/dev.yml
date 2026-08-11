@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# Dev/lint/run tasks — invoked as `task dev:<name>`. See docs/adr/0020-task-automation-modular-taskfiles.md
+version: '3'
+
+tasks:
+  setup:
+    desc: Create a virtualenv and install dependencies
+    cmds:
+      - python3 -m venv .venv
+      - .venv/bin/pip install -U pip
+      - .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+
+  lint:
+    desc: Run static analysis (ruff) and type checking (mypy)
+    cmds:
+      - .venv/bin/ruff check app tests
+      - .venv/bin/mypy app
+
+  format:
+    desc: Auto-format the codebase with ruff
+    cmds:
+      - .venv/bin/ruff format app tests
+
+  api:
+    desc: Run the FastAPI app locally with autoreload
+    cmds:
+      - .venv/bin/uvicorn app.api.main:app --reload --port 8000

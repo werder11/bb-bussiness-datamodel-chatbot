@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# Evaluation tasks — invoked as `task eval:<name>`.
+# This is the CI/CD slow gate (docs/adr/0019) — costs real LLM calls, run on demand / pre-release,
+# not on every push. See docs/adr/0017-evaluation-as-first-class-layer.md for the KPI definitions
+# (data quality, retrieval quality, answer quality) this produces.
+version: '3'
+
+tasks:
+  run:
+    desc: Run the evaluation dataset and produce a KPI report (Data/Retrieval/Answer Quality)
+    cmds:
+      - .venv/bin/python -m tests.eval.run --report docs/eval-report.md
+
+  report:
+    desc: Open the most recently generated evaluation report
+    cmds:
+      - cmd: open docs/eval-report.md
+        platforms: [darwin]
+      - cmd: xdg-open docs/eval-report.md
+        platforms: [linux]
+      - cmd: start docs/eval-report.md
+        platforms: [windows]
