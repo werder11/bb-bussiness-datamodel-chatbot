@@ -56,7 +56,7 @@ class QueryResponseSchema(BaseModel):
     debug: PipelineDebugSchema
 
     @classmethod
-    def from_domain(cls, response: PipelineQueryResponse) -> "QueryResponseSchema":
+    def from_domain(cls, response: PipelineQueryResponse) -> QueryResponseSchema:
         return cls(**response.model_dump())
 
 
@@ -83,7 +83,7 @@ class EvaluateResponseSchema(BaseModel):
     @classmethod
     def from_domain(
         cls, response: PipelineQueryResponse, comparison: AnswerComparison
-    ) -> "EvaluateResponseSchema":
+    ) -> EvaluateResponseSchema:
         return cls(
             query=QueryResponseSchema.from_domain(response),
             comparison=AnswerComparisonSchema(**comparison.model_dump()),

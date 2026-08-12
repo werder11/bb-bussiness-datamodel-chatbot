@@ -36,6 +36,7 @@ Structural/shape-level architecture decisions for the reeeliance Business Data M
 | [0028](0028-pipeline-zoom-view-server-side-debug-payload.md) | Pipeline Zoom View — a Real `debug` Payload, Not More Client-Side Guessing | Accepted | 2026-08-12 |
 | [0029](0029-playwright-e2e-tests.md) | Playwright E2E Tests — Real Browser, No LLM Credentials Required | Accepted | 2026-08-12 |
 | [0030](0030-interactive-answer-scoring-utility.md) | Interactive "Score an Answer" Utility — Real Pipeline, Lexical Comparison, No External Eval Framework | Accepted | 2026-08-12 |
+| [0031](0031-migrate-to-uv.md) | Migrate Python Dependency Management to uv | Accepted | 2026-08-12 |
 
 ## Decision Graph (Reading Order)
 
@@ -58,6 +59,7 @@ The ADRs build on each other roughly in this dependency order, not strictly nume
 15. **UI + pipeline zoom**: 0028 (per-stage debug payload) — the one place this project deliberately crosses the thin-client line 0025/0027 hold everywhere else, because the alternative is data that cannot be recovered any other way
 16. **E2E verification**: 0029 (Playwright) — the first automated check of everything 0025-0028 built, closing the "not verified in an actual browser" caveat every one of those ADRs left open
 17. **UI + interactive evaluation**: 0030 (score-an-answer utility) — completes the early-session evaluation discussion 0026 partially answered (static KPI snapshot); reuses 0028's zoom-view and 0025's pipeline wiring rather than introducing a new evaluation code path
+18. **Dependency tooling**: 0031 (migrate to uv) — orthogonal to the feature work above; closes a reproducibility gap (unpinned deps, a repeated-flag footgun) present since Phase 0, structurally rather than by convention
 
 ## Creating a New ADR
 

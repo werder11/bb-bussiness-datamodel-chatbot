@@ -20,14 +20,17 @@ RUN npm run build
 
 FROM python:3.14-slim AS builder
 
+# Official distroless uv image — just the binary, nothing else (ADR-0031).
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 WORKDIR /app
 
-COPY requirements.txt .
-# --extra-index-url pulls the CPU-only torch build (sentence-transformers'
-# dependency) instead of PyPI's default CUDA-bundled wheel — this is a small
-# CPU-only embedding workload with no GPU in play, and the CUDA wheel adds
-# several GB of unused NVIDIA libraries plus a much longer build.
-RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
+COPY pyproject.toml uv.lock ./
+# --no-dev: this stage only ever runs `app.ingestion.run`, never pytest/ruff/
+# mypy. CPU-only torch on Linux comes from pyproject.toml's
+# [tool.uv.sources]/[[tool.uv.index]], not a per-install-site flag.
+RUN uv sync --locked --no-dev
+ENV PATH="/app/.venv/bin:$PATH"
 
 COPY app ./app
 # Sparse-cloned once, locally, before `docker build` — not fetched by the
@@ -41,18 +44,17 @@ RUN python -m app.ingestion.run
 
 FROM python:3.14-slim AS runtime
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 WORKDIR /app
 
 # The embedding model is already baked in below — no reason for the
 # huggingface_hub client to ever make a network call to check for updates.
 ENV HF_HUB_OFFLINE=1
 
-COPY requirements.txt .
-# --extra-index-url pulls the CPU-only torch build (sentence-transformers'
-# dependency) instead of PyPI's default CUDA-bundled wheel — this is a small
-# CPU-only embedding workload with no GPU in play, and the CUDA wheel adds
-# several GB of unused NVIDIA libraries plus a much longer build.
-RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
+COPY pyproject.toml uv.lock ./
+RUN uv sync --locked --no-dev
+ENV PATH="/app/.venv/bin:$PATH"
 
 COPY --from=builder /app/app ./app
 COPY --from=builder /app/cdm.db ./cdm.db

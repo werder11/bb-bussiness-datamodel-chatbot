@@ -35,7 +35,7 @@ Outside this knowledge graph: [`FINDINGS.md`](../FINDINGS.md) (project root) is 
 
 ## Active Decisions
 
-30 ADRs, all **Accepted** (two superseded by later ones) — full index with status, date, and a suggested reading order: [`docs/adr/README.md`](adr/README.md). Headline decisions:
+31 ADRs, all **Accepted** (two superseded by later ones) — full index with status, date, and a suggested reading order: [`docs/adr/README.md`](adr/README.md). Headline decisions:
 
 | ADR | Topic | Status |
 |---|---|---|
@@ -54,6 +54,7 @@ Outside this knowledge graph: [`FINDINGS.md`](../FINDINGS.md) (project root) is 
 | [0028](adr/0028-pipeline-zoom-view-server-side-debug-payload.md) | Pipeline zoom view — real per-query debug payload | Accepted |
 | [0029](adr/0029-playwright-e2e-tests.md) | Playwright E2E tests — real browser, no LLM credentials required | Accepted |
 | [0030](adr/0030-interactive-answer-scoring-utility.md) | Interactive "score an answer" utility — real pipeline, lexical comparison | Accepted |
+| [0031](adr/0031-migrate-to-uv.md) | Migrate Python dependency management to uv | Accepted |
 
 All vendor/tech picks (vector DB, LLM provider(s), embedding model, chunking granularity) are decided — see [`FINDINGS.md §7`](../FINDINGS.md#7-open-architecture-decisions) for the resolution history.
 

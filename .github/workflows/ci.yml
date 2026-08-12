@@ -33,6 +33,10 @@ jobs:
         with:
           python-version: "3.14"
 
+      - uses: astral-sh/setup-uv@v9
+        with:
+          enable-cache: true
+
       # UI type-check + build is part of ci:fast (ADR-0025) — version matches
       # the Dockerfile's frontend-builder stage (node:22-slim).
       - uses: actions/setup-node@v4
@@ -75,6 +79,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.14"
+
+      - uses: astral-sh/setup-uv@v9
+        with:
+          enable-cache: true
 
       - uses: arduino/setup-task@v2
 

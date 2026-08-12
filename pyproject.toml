@@ -1,3 +1,61 @@
+[project]
+name = "cdm-rag-chatbot"
+version = "0.1.0"
+description = "RAG API over the Microsoft CDM Banking Model — reeeliance case study"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic>=2",
+    "chromadb",
+    "sentence-transformers",
+    "anthropic",
+    "google-genai",
+    # Only ever a transitive dependency of sentence-transformers otherwise —
+    # listed explicitly because [tool.uv.sources]'s CPU-only-on-Linux
+    # override below only reliably applies to a *direct* project
+    # dependency. Found live: without this, `uv sync` inside the Linux
+    # Docker build silently resolved torch from plain PyPI (the default
+    # CUDA-bundled build, with a `cuda-toolkit[curand, cusolver, ...]`
+    # dependency chain) instead of the pinned CPU-only index, despite the
+    # source override existing — confirmed via `uv.lock`'s recorded
+    # `source = { registry = "https://pypi.org/simple" }` for torch.
+    "torch",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "mypy",
+    "httpx",
+]
+
+[tool.uv]
+# Not a distributable package — a plain app run via `python -m app.*`/
+# `uvicorn app.api.main:app`, same as the old flat requirements.txt install.
+# Without this, `uv sync` tries to build/install app/ itself as a wheel.
+package = false
+
+[tool.uv.sources]
+# CPU-only torch build on Linux (sentence-transformers' transitive
+# dependency) instead of PyPI's default CUDA-bundled wheel — a small
+# CPU-only embedding workload with no GPU in play; the CUDA wheel adds
+# several GB of unused NVIDIA libraries plus a much longer install.
+# `explicit = true` on the index below scopes this to torch/torchvision
+# only, and the platform marker leaves macOS dev machines on PyPI's
+# default (CPU/Metal) wheel untouched — same behavior the old
+# `--extra-index-url` pip flag had, now expressed as project config
+# instead of a flag every install site had to remember to pass.
+torch = [
+    { index = "pytorch-cpu", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
 [tool.ruff.lint.flake8-bugbear]
 # FastAPI's `Depends(...)` in argument defaults is the framework's documented
 # pattern, not the mutable-default-argument bug B008 exists to catch.

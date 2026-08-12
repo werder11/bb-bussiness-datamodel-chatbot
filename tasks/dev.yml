@@ -4,14 +4,15 @@ version: '3'
 
 tasks:
   setup:
-    desc: Create a virtualenv and install dependencies
+    desc: Create a virtualenv and install dependencies (uv)
     cmds:
-      - python3 -m venv .venv
-      - .venv/bin/pip install -U pip
-      # --extra-index-url pulls the CPU-only torch build on Linux (sentence-transformers'
-      # dependency) instead of PyPI's default CUDA-bundled wheel -- see Dockerfile for the
-      # full rationale. Harmless no-op on macOS, which only ever has a CPU/Metal wheel anyway.
-      - .venv/bin/pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt -r requirements-dev.txt
+      # Reads pyproject.toml + uv.lock; creates/updates .venv in place, so
+      # every `.venv/bin/*` invocation elsewhere in this Taskfile keeps
+      # working unchanged. The CPU-only-torch-on-Linux behavior a plain pip
+      # install needed an `--extra-index-url` flag for now lives in
+      # pyproject.toml's [tool.uv.sources]/[[tool.uv.index]] instead — see
+      # docs/adr/0031-migrate-to-uv.md.
+      - uv sync
 
   lint:
     desc: Run static analysis (ruff) and type checking (mypy)

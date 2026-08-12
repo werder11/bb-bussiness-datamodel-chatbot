@@ -23,7 +23,7 @@ Quick orientation:
 
 ## Quickstart
 
-Requires Python 3.14, Node 22+, [go-task](https://taskfile.dev), and Docker. `task --list-all` lists every available command.
+Requires Python 3.14, [uv](https://docs.astral.sh/uv/), Node 22+, [go-task](https://taskfile.dev), and Docker. `task --list-all` lists every available command.
 
 ```bash
 task dev:setup   # create .venv, install Python dependencies
