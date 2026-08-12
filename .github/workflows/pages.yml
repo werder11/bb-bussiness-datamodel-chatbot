@@ -1,0 +1,44 @@
+# Deploys presentation/ (the two case-study deliverables — technical
+# walkthrough + self-intro slide) to GitHub Pages. Independent of ci.yml's
+# fast/slow gates (ADR-0019) — this is a static-file publish, not a build
+# or test gate, and only ever touches presentation/.
+#
+# One-time manual step this workflow can't do for itself: repo Settings →
+# Pages → Build and deployment → Source → "GitHub Actions". Until that's
+# set, this workflow runs but has nowhere to deploy to.
+name: Deploy Presentation to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "presentation/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: presentation
+
+      - id: deployment
+        uses: actions/deploy-pages@v5

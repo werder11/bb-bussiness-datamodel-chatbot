@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CDM RAG Chatbot — Presentation</title>
+<style>
+  :root {
+    --ink: #0b0e14;
+    --panel: #11151f;
+    --border: #262c3d;
+    --text: #e7e9f2;
+    --text-dim: #8b91a7;
+    --text-faint: #565d76;
+    --structured: #5b8cff;
+    --traversal: #45c2c2;
+    --semantic: #a78bfa;
+    --font-display: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Text", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(2rem, 6vw, 5rem) 1.5rem;
+    gap: 2.5rem;
+  }
+
+  .header {
+    text-align: center;
+    max-width: 40rem;
+  }
+
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--semantic);
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.75rem;
+    text-wrap: balance;
+  }
+
+  .sub {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 52rem;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .card:hover,
+  .card:focus-visible {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .card.tech { --accent: var(--structured); }
+  .card.intro { --accent: var(--semantic); }
+
+  .card .tag {
+    align-self: flex-start;
+    font-family: var(--font-display);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+  }
+
+  .card h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 650;
+  }
+
+  .card p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .card .open {
+    margin-top: auto;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+
+  .footer {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  .footer a {
+    color: var(--text-dim);
+  }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <p class="eyebrow">reeeliance — senior data &amp; ai architect</p>
+    <h1>CDM RAG Chatbot — Presentation</h1>
+    <p class="sub">Both required deliverables for the case study, rendered directly — no download, no build step. Arrow keys or click to navigate within each deck.</p>
+  </div>
+
+  <div class="cards">
+    <a class="card tech" href="technical-walkthrough.html">
+      <span class="tag">01 · Technical walkthrough</span>
+      <h2>Embedding strategy &amp; relationship handling</h2>
+      <p>4 slides, capped per the brief. Real numbers from the running system: vector-search scores, the actual entity-collision case, the brief's own 2-hop traversal question, and live evaluation KPIs.</p>
+      <span class="open">Open deck →</span>
+    </a>
+
+    <a class="card intro" href="self-intro.html">
+      <span class="tag">02 · Self-intro</span>
+      <h2>How I see myself in this role</h2>
+      <p>Strengths, experience, and role evolution — grounded in the real resume and reference letter, mapped directly against the actual reeeliance job posting.</p>
+      <span class="open">Open slide →</span>
+    </a>
+  </div>
+
+  <p class="footer">Source: <a href="https://github.com/werder11/bb-bussiness-datamodel-chatbot">github.com/werder11/bb-bussiness-datamodel-chatbot</a></p>
+
+</body>
+</html>
