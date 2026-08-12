@@ -4,6 +4,13 @@ A FastAPI service that answers natural-language questions about the [Microsoft C
 
 Built as a take-home case study for a Senior Data & AI Architect role at reeeliance.
 
+## Presentation
+
+Live, rendered — no download needed: **https://werder11.github.io/bb-bussiness-datamodel-chatbot/** (`.github/workflows/pages.yml` publishes `presentation/` on every push that touches it; requires the one-time repo Settings → Pages → Source → "GitHub Actions" toggle).
+
+- [`presentation/technical-walkthrough.html`](presentation/technical-walkthrough.html) — the brief's required 4-slide technical walkthrough (embedding strategy + how relationships were handled), self-contained and arrow-key navigable; open it directly in a browser, no build step. Every number and quote on it comes from actually running the code against the real corpus — the KPI slide mirrors `docs/eval-report.md` (gitignored by default; run `task eval:run` to regenerate it, or un-gitignore it if you want the committed repo to include the exact numbers shown).
+- [`presentation/self-intro.html`](presentation/self-intro.html) — the brief's required self-intro slide ("How do I see myself as a Senior Data & AI Architect at reeeliance?"), same visual system as the technical walkthrough. Strengths, experience, and role evolution, each grounded in real resume/reference-letter facts rather than generic claims.
+
 ## What it does
 
 - Ingests the CDM Banking Model + common/supporting objects (44 entities) into a Canonical Model, then two retrieval indexes: a relational one (SQLite) for deterministic attribute/relationship lookups and a semantic one (ChromaDB) for open-ended questions.
@@ -85,10 +92,3 @@ A sixth, UI-side level lives in `ui/tests/e2e/` — Playwright against a real br
 ## CI/CD
 
 `.github/workflows/ci.yml` — fast gate (`task ci:fast`: lint, all test levels, UI type-check + build, Docker build) on every push; slow gate (`task ci:slow`: live ingestion + full evaluation dataset) on manual `workflow_dispatch` only, since it costs real LLM calls. See [`docs/operations/ci-cd.md`](docs/operations/ci-cd.md).
-
-## Presentation
-
-Live, rendered — no download needed: **https://werder11.github.io/bb-bussiness-datamodel-chatbot/** (`.github/workflows/pages.yml` publishes `presentation/` on every push that touches it; requires the one-time repo Settings → Pages → Source → "GitHub Actions" toggle).
-
-- [`presentation/technical-walkthrough.html`](presentation/technical-walkthrough.html) — the brief's required 4-slide technical walkthrough (embedding strategy + how relationships were handled), self-contained and arrow-key navigable; open it directly in a browser, no build step. Every number and quote on it comes from actually running the code against the real corpus — the KPI slide mirrors `docs/eval-report.md` (gitignored by default; run `task eval:run` to regenerate it, or un-gitignore it if you want the committed repo to include the exact numbers shown).
-- [`presentation/self-intro.html`](presentation/self-intro.html) — the brief's required self-intro slide ("How do I see myself as a Senior Data & AI Architect at reeeliance?"), same visual system as the technical walkthrough. Strengths, experience, and role evolution, each grounded in real resume/reference-letter facts rather than generic claims.
