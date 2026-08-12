@@ -35,7 +35,7 @@ Outside this knowledge graph: [`FINDINGS.md`](../FINDINGS.md) (project root) is 
 
 ## Active Decisions
 
-22 ADRs, all **Accepted** (one superseded by a later one) — full index with status, date, and a suggested reading order: [`docs/adr/README.md`](adr/README.md). Headline decisions:
+30 ADRs, all **Accepted** (two superseded by later ones) — full index with status, date, and a suggested reading order: [`docs/adr/README.md`](adr/README.md). Headline decisions:
 
 | ADR | Topic | Status |
 |---|---|---|
@@ -46,12 +46,20 @@ Outside this knowledge graph: [`FINDINGS.md`](../FINDINGS.md) (project root) is 
 | [0016](adr/0016-deterministic-hits-template-rendered.md) | Template deterministic hits, LLM only for synthesis | Accepted |
 | [0017](adr/0017-evaluation-as-first-class-layer.md) | Evaluation as a first-class layer | Accepted |
 | [0021](adr/0021-schema-based-design-at-port-boundaries.md) | Schema-based design at every boundary | Accepted |
+| [0023](adr/0023-tech-layer-adapters.md) | Tech-layer adapters — ChromaDB, sentence-transformers, per-entity chunking | Accepted |
+| [0024](adr/0024-second-llm-provider-gemini.md) | Second LLM provider (Gemini), swappable via `LLM_PROVIDER` | Accepted |
+| [0025](adr/0025-ui-typescript-chat-and-entity-browser.md) | UI — TypeScript chat + entity browser, served by FastAPI | Accepted |
+| [0026](adr/0026-eval-kpi-snapshot-in-ui.md) | Evaluation KPI snapshot in the UI, build-time not live | Accepted |
+| [0027](adr/0027-pipeline-view-derived-client-side.md) | Pipeline view, reconstructed client-side, no new API field | Accepted |
+| [0028](adr/0028-pipeline-zoom-view-server-side-debug-payload.md) | Pipeline zoom view — real per-query debug payload | Accepted |
+| [0029](adr/0029-playwright-e2e-tests.md) | Playwright E2E tests — real browser, no LLM credentials required | Accepted |
+| [0030](adr/0030-interactive-answer-scoring-utility.md) | Interactive "score an answer" utility — real pipeline, lexical comparison | Accepted |
 
-Still **open** (deliberately, tracked outside the ADR set since they're vendor/tech picks, not shape decisions): vector DB flavor, LLM provider, embedding model, chunking granularity — see [`FINDINGS.md §7`](../FINDINGS.md#7-open-architecture-decisions).
+All vendor/tech picks (vector DB, LLM provider(s), embedding model, chunking granularity) are decided — see [`FINDINGS.md §7`](../FINDINGS.md#7-open-architecture-decisions) for the resolution history.
 
 ## Current Project Phase
 
-Architecture accepted; implementation not started. See [Vision: Roadmap](vision/roadmap.md) for the punch list before code begins and the deliverables checklist.
+Implementation complete — all 9 build phases done, tested (122 automated tests across unit/integration/system/acceptance), and verified against the real 44-entity ingested corpus and a real running Docker container. Remaining work is non-code: committing/pushing the repo, and the self-intro + technical-walkthrough slides. See [Vision: Roadmap](vision/roadmap.md) and `.docs/adhoc/cdm-rag-chatbot/cdm-rag-chatbot-tasks.md` for the detailed checklist.
 
 ## AI Agent Navigation Rule
 

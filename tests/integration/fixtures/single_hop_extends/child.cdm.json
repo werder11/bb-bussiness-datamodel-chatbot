@@ -1,0 +1,26 @@
+{
+  "jsonSchemaSemanticVersion": "1.0.0",
+  "definitions": [
+    {
+      "entityName": "IndividualParty",
+      "extendsEntity": "BusinessParty",
+      "description": "A single-person party, extending the shared BusinessParty attributes.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {
+                "name": "fullName",
+                "description": "The individual's full name.",
+                "isNullable": true,
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "documentVersion": "1.0"
+}

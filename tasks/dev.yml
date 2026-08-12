@@ -8,7 +8,10 @@ tasks:
     cmds:
       - python3 -m venv .venv
       - .venv/bin/pip install -U pip
-      - .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+      # --extra-index-url pulls the CPU-only torch build on Linux (sentence-transformers'
+      # dependency) instead of PyPI's default CUDA-bundled wheel -- see Dockerfile for the
+      # full rationale. Harmless no-op on macOS, which only ever has a CPU/Metal wheel anyway.
+      - .venv/bin/pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt -r requirements-dev.txt
 
   lint:
     desc: Run static analysis (ruff) and type checking (mypy)

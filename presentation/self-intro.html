@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Emre Gözütok — Self-Intro</title>
+<style>
+  :root {
+    --ink: #0b0e14;
+    --panel: #11151f;
+    --panel-2: #161b28;
+    --border: #262c3d;
+    --text: #e7e9f2;
+    --text-dim: #8b91a7;
+    --text-faint: #565d76;
+    --structured: #5b8cff;
+    --traversal: #45c2c2;
+    --semantic: #a78bfa;
+    --neutral: #8890a3;
+    --ok: #3ddc84;
+    --font-display: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Text", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--font-body);
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.4rem, 3vw, 2.6rem) clamp(1.6rem, 5vw, 4rem);
+    gap: 1.1rem;
+    min-height: 100vh;
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .identity {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .monogram {
+    width: 3.2rem;
+    height: 3.2rem;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--semantic);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+  }
+
+  .identity h1 {
+    margin: 0;
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+
+  .identity .role {
+    margin: 0.15rem 0 0;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .meta {
+    text-align: right;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    line-height: 1.7;
+  }
+
+  .meta span { color: var(--text-dim); }
+
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--semantic);
+    margin: 0 0 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 1.6rem;
+    height: 1px;
+    background: var(--semantic);
+    display: inline-block;
+  }
+
+  .thesis {
+    font-size: clamp(1.15rem, 2.1vw, 1.5rem);
+    font-weight: 650;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    max-width: 46ch;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .thesis .accent { color: var(--semantic); }
+
+  .body-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    gap: clamp(1.4rem, 3vw, 2.6rem);
+    flex: 1;
+    min-height: 0;
+  }
+
+  .col { display: flex; flex-direction: column; gap: 0.85rem; min-width: 0; }
+
+  .fact {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    padding: 0.6rem 0.75rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .fact .tag {
+    font-family: var(--font-display);
+    font-size: 0.63rem;
+    color: var(--ink);
+    background: var(--text-dim);
+    border-radius: 4px;
+    padding: 0.12rem 0.35rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .fact p { margin: 0; font-size: 0.84rem; line-height: 1.5; color: var(--text); }
+  .fact p .dim { color: var(--text-dim); }
+  .fact p strong { font-weight: 650; }
+
+  .strengths-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .strength-card {
+    padding: 0.65rem 0.75rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--semantic);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .strength-card .title {
+    font-size: 0.84rem;
+    font-weight: 650;
+    color: var(--text);
+  }
+
+  .strength-card p {
+    margin: 0;
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: var(--text-dim);
+  }
+
+  .impact {
+    display: flex;
+    gap: 0.7rem;
+    align-items: baseline;
+    padding: 0.6rem 0.75rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--traversal);
+    border-radius: 8px;
+  }
+
+  .impact .n {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    color: var(--traversal);
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+
+  .impact p { margin: 0; font-size: 0.83rem; line-height: 1.5; color: var(--text); }
+  .impact p strong { color: var(--traversal); font-weight: 650; }
+  .impact p em { color: var(--semantic); font-style: normal; font-weight: 600; }
+  .impact p .dim { color: var(--text-dim); }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    margin: 0 0 0.1rem;
+  }
+
+  .growth {
+    padding: 0.7rem 0.85rem;
+    background: var(--panel-2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    font-size: 0.79rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .growth strong { color: var(--text); }
+
+  .bottom {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .closing {
+    max-width: 62ch;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .closing .accent { color: var(--semantic); font-weight: 650; }
+
+  .stat-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.45rem 0.7rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    min-width: 5.5rem;
+  }
+
+  .stat .v {
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stat .l { font-size: 0.62rem; color: var(--text-dim); line-height: 1.25; }
+
+  @media (max-width: 900px) {
+    .strengths-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 820px) {
+    .body-grid { grid-template-columns: 1fr; overflow-y: auto; }
+    .top { flex-direction: column; }
+    .meta { text-align: left; }
+    html, body { overflow-y: auto; height: auto; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="top">
+    <div class="identity">
+      <div class="monogram">EG</div>
+      <div>
+        <h1>Emre Gözütok</h1>
+        <p class="role">Senior Data &amp; AI Architect candidate — reeeliance</p>
+      </div>
+    </div>
+    <div class="meta">
+      Immenstaad, Germany <span>· open to relocation</span><br>
+      German C1 <span>·</span> English C1<br>
+      linkedin.com/in/emregozutok
+    </div>
+  </div>
+
+  <p class="eyebrow">How I see myself in this role</p>
+  <p class="thesis">I'm <span class="accent">a GenAI systems architect in practice</span> — not adjacent to this role, already living inside it.</p>
+
+  <div class="strengths-row">
+    <div class="strength-card"><span class="title">Founding ownership</span><p>Solely initiated, architected, and built the ASAP AI Platform, functioning as its technical lead — not a contributor to someone else's plan.</p></div>
+    <div class="strength-card"><span class="title">Leads people &amp; stakeholders</span><p>Mentored engineers, reviewed PRs, coordinated cross-functional client work directly with product owners and architects.</p></div>
+    <div class="strength-card"><span class="title">Engineering range</span><p>Python-first, fluent in Go and TypeScript too. Cloud architecture across Azure, AWS, and GCP. MLOps end to end — MLflow, Kubeflow, Dagster, Airflow.</p></div>
+    <div class="strength-card"><span class="title">Hands-on across the agent stack</span><p>Coding agents, multi-agent orchestration, RAG, and the evaluation framework that governs all of it.</p></div>
+  </div>
+
+  <div class="body-grid">
+    <div class="col">
+      <p class="section-title">Experience</p>
+      <div class="fact"><span class="tag">NOW</span><p><strong>Expert Software Engineer, ASAP GmbH</strong> <span class="dim">— 10/2022–2025, automotive OEM AI/data platforms; most recently Project Lead DevOps and Generative AI development.</span></p></div>
+      <div class="fact"><span class="tag">BUILT</span><p><strong>ASAP AI Platform</strong> <span class="dim">— multi-agent orchestration, coding agents, RAG, the DeepEval evaluation framework.</span></p></div>
+      <div class="fact"><span class="tag">OWNED</span><p><strong>Centralized metadata platform</strong> <span class="dim">(Neo4j, Elasticsearch, Kibana) across multiple AI/ML pipelines.</span></p></div>
+      <div class="fact"><span class="tag">PRESENTED</span><p>Two industry webinars, as the GenAI expert representing the company <span class="dim">— "Gen-AI in Software Validation" and "Agentic AI in the SDLC," 2025.</span></p></div>
+      <div class="fact"><span class="tag">EARLIER</span><p>RL research (MSc, summa cum laude, 4.0) and simulation engineering for defence and automotive.</p></div>
+    </div>
+
+    <div class="col">
+      <p class="section-title">Role evolution — the impact I'd bring</p>
+      <div class="impact"><span class="n">01</span><p><strong>What I'd do first:</strong> map the real data landscape before writing a line of pipeline code — schema quality, lineage, governance maturity, <em>scored, not assumed</em>.</p></div>
+      <div class="impact"><span class="n">02</span><p><strong>Where I'd focus:</strong> the metadata and retrieval layer underneath the model, since that's what a client still trusts two years later. <span class="dim">And I wouldn't build it alone — the ASAP platform was mine to start, not mine to grow by myself; I learned as much from the engineers I mentored as they did from me.</span></p></div>
+      <div class="impact"><span class="n">03</span><p><strong>Where I see the role heading:</strong> architecture is moving from data pipelines toward intelligent, autonomous solutions — and the architect's job is translating that shift into terms a client can act on, as much as it is building it.</p></div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="stat-row">
+      <div class="stat"><span class="v">5+</span><span class="l">years, AI infra</span></div>
+      <div class="stat"><span class="v">🏆</span><span class="l">Hackathon finalist — live OTA demo</span></div>
+      <div class="stat"><span class="v">4.0</span><span class="l">MSc GPA</span></div>
+    </div>
+  </div>
+
+</body>
+</html>

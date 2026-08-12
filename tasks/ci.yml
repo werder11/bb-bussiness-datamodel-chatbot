@@ -8,12 +8,16 @@ tasks:
   fast:
     desc: "Fast gate (every push): lint, typecheck, all test levels, Docker build -- no LLM calls"
     cmds:
-      - task: dev:lint
-      - task: test:all
-      - task: docker:build
+      # Leading ":" addresses the root Taskfile's namespace -- required to
+      # call a sibling-included namespace's task from within this included
+      # file (plain "dev:lint" resolves relative to *this* file and fails).
+      - task: :dev:lint
+      - task: :test:all
+      - task: :ui:build
+      - task: :docker:build
 
   slow:
     desc: "Slow gate (on demand / pre-release): full ingestion + full evaluation dataset -- costs LLM calls"
     cmds:
-      - task: ingest:run
-      - task: eval:run
+      - task: :ingest:run
+      - task: :eval:run

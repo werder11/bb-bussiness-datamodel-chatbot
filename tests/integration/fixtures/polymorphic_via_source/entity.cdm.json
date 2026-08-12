@@ -1,0 +1,39 @@
+{
+  "jsonSchemaSemanticVersion": "1.0.0",
+  "definitions": [
+    {
+      "entityName": "FICard",
+      "extendsEntity": "CdmEntity",
+      "description": "A financial instrument card, modeled on the real Fi_card.cdm.json 'Cardholder' member.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {
+                "name": "Cardholder",
+                "description": "The customer associated with the card.",
+                "isNullable": true,
+                "dataType": "customer",
+                "isPolymorphicSource": true,
+                "entity": {
+                  "source": {
+                    "entityReference": {
+                      "entityName": "FICardCardholderOptions",
+                      "hasAttributes": [
+                        { "name": "accountOption", "entity": { "source": "Account" } },
+                        { "name": "contactOption", "entity": { "source": "Contact" } }
+                      ]
+                    }
+                  },
+                  "runSequentially": true
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "documentVersion": "1.0"
+}

@@ -1,0 +1,39 @@
+{
+  "jsonSchemaSemanticVersion": "1.0.0",
+  "definitions": [
+    {
+      "entityName": "Case",
+      "extendsEntity": "CdmEntity",
+      "description": "A service case raised by a customer.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {
+                "purpose": "referencesCustomer",
+                "entity": {
+                  "entityReference": {
+                    "entityName": "Customer",
+                    "hasAttributes": [
+                      {
+                        "entity": { "entityReference": "Contact" },
+                        "name": "contactOption"
+                      },
+                      {
+                        "entity": { "entityReference": "Account" },
+                        "name": "accountOption"
+                      }
+                    ]
+                  }
+                },
+                "name": "customer"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "documentVersion": "1.0"
+}

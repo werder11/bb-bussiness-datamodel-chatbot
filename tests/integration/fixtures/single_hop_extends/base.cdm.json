@@ -1,0 +1,27 @@
+{
+  "jsonSchemaSemanticVersion": "1.0.0",
+  "definitions": [
+    {
+      "entityName": "BusinessParty",
+      "extendsEntity": "CdmEntity",
+      "description": "A party in a business transaction.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {
+                "name": "partyId",
+                "description": "Unique identifier of the party.",
+                "isNullable": false,
+                "purpose": "identifiedBy",
+                "dataType": "entityId"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "documentVersion": "1.0"
+}

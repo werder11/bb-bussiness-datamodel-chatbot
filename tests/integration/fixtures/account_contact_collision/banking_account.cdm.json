@@ -1,0 +1,27 @@
+{
+  "jsonSchemaSemanticVersion": "1.1.0",
+  "definitions": [
+    {
+      "entityName": "Account",
+      "extendsEntity": "CdmEntity",
+      "description": "Business that represents a customer or potential customer.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {
+                "name": "accountId",
+                "description": "Unique identifier of the account.",
+                "isNullable": false,
+                "purpose": "identifiedBy",
+                "dataType": "entityId"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "documentVersion": "1.0"
+}

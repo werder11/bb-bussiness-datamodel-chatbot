@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# UI (thin client, ADR-0025) tasks — invoked as `task ui:<name>`.
+version: '3'
+
+tasks:
+  setup:
+    desc: Install UI dependencies
+    dir: ui
+    cmds:
+      - npm ci
+
+  dev:
+    desc: Run the UI dev server with autoreload (proxies API calls to :8000 — run `task dev:api` alongside)
+    dir: ui
+    deps: [setup]
+    cmds:
+      - npm run dev
+
+  build:
+    desc: Type-check and build the UI to ui/dist (served by the API when present — see app/api/main.py)
+    dir: ui
+    deps: [setup]
+    cmds:
+      - npm run build
+
+  e2e:setup:
+    desc: Install the Playwright browser (one-time; ~150-300MB download, not run automatically by ci:fast — ADR-0029)
+    dir: ui
+    deps: [setup]
+    cmds:
+      - npx playwright install --with-deps chromium
+
+  e2e:
+    desc: Run the Playwright E2E suite against a real server + real browser — no LLM key needed (ADR-0029)
+    dir: ui
+    deps: [build]
+    cmds:
+      - npx playwright test

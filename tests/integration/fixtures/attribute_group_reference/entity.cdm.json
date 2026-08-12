@@ -1,0 +1,40 @@
+{
+  "jsonSchemaSemanticVersion": "1.0.0",
+  "definitions": [
+    {
+      "entityName": "Branch",
+      "extendsEntity": "CdmEntity",
+      "description": "A physical bank branch.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "coreAttributes",
+            "members": [
+              {
+                "name": "branchId",
+                "description": "Unique identifier of the branch.",
+                "isNullable": false,
+                "purpose": "identifiedBy",
+                "dataType": "entityId"
+              }
+            ]
+          }
+        },
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {
+                "name": "branchName",
+                "description": "The branch's display name.",
+                "isNullable": true,
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "documentVersion": "1.0"
+}

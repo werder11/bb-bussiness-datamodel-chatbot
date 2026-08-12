@@ -1,0 +1,109 @@
+# CI/CD pipeline, layered by cost and speed — ADR-0019. No logic beyond
+# what tasks/ci.yml already composes; this workflow just invokes it.
+#
+# Fast gate (`task ci:fast`) runs on every push/PR: lint, typecheck, every
+# test level, UI typecheck + build (ADR-0025), Docker build. No live
+# external services.
+#
+# Slow gate (`task ci:slow`) is manual-trigger only: full ingestion against
+# the live CDM source + the full evaluation dataset, including real LLM
+# calls (ADR-0017) — costs real money/time, so it never runs on a push.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      gate:
+        description: Which gate to run
+        required: true
+        default: fast
+        type: choice
+        options: [fast, slow]
+
+jobs:
+  fast:
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.gate == 'fast'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      # UI type-check + build is part of ci:fast (ADR-0025) — version matches
+      # the Dockerfile's frontend-builder stage (node:22-slim).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: arduino/setup-task@v2
+
+      # Sparse-cloned once, cached indefinitely (ADR-0008: ingestion pins
+      # whatever's present at ingestion time, no re-fetch mechanism by
+      # design — a long-lived cache is consistent with that, not a
+      # workaround). Bump the key if a refresh is ever actually wanted.
+      - name: Cache CDM source
+        id: cdm-cache
+        uses: actions/cache@v4
+        with:
+          path: cdm-source
+          key: cdm-source-v1
+
+      - name: Sparse-clone Microsoft CDM (schemaDocuments only)
+        if: steps.cdm-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone --filter=blob:none --no-checkout https://github.com/microsoft/CDM.git cdm-source
+          cd cdm-source
+          git sparse-checkout set schemaDocuments
+          git checkout master
+
+      - name: Install dependencies
+        run: task dev:setup
+
+      - name: Fast gate
+        run: task ci:fast
+
+  slow:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.gate == 'slow'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - uses: arduino/setup-task@v2
+
+      - name: Cache CDM source
+        id: cdm-cache
+        uses: actions/cache@v4
+        with:
+          path: cdm-source
+          key: cdm-source-v1
+
+      - name: Sparse-clone Microsoft CDM (schemaDocuments only)
+        if: steps.cdm-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone --filter=blob:none --no-checkout https://github.com/microsoft/CDM.git cdm-source
+          cd cdm-source
+          git sparse-checkout set schemaDocuments
+          git checkout master
+
+      - name: Install dependencies
+        run: task dev:setup
+
+      - name: Slow gate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: task ci:slow
+
+      - name: Upload evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: docs/eval-report.md

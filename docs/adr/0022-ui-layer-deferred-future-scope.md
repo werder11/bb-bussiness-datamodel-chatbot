@@ -1,8 +1,10 @@
 # ADR-0022: UI Layer Deferred to Future Scope
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0025](0025-ui-typescript-chat-and-entity-browser.md)
 **Date:** 2026-08-11
 **Deciders:** Emre Gözütok
+
+> **2026-08-11 update:** the UI was built later the same day. [ADR-0025](0025-ui-typescript-chat-and-entity-browser.md) implements exactly the shape this ADR pre-decided — thin client, no new backend logic — with the two remaining choices (tech stack, scope) made there. This document is kept for the reasoning behind *why* a UI wasn't in the original deliverable scope.
 
 ## Context
 

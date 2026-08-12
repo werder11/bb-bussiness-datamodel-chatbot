@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-08-11",
+  "question_count": 27,
+  "data_quality": {
+    "entity_resolution_rate": 1.0,
+    "unresolved_reference_rate": 0.1959
+  },
+  "retrieval": {
+    "entity_matching_accuracy": 1.0,
+    "structured_precision": 1.0,
+    "structured_recall": 1.0,
+    "relationship_precision": 1.0,
+    "relationship_recall": 1.0,
+    "traversal_accuracy": 1.0,
+    "vector_recall_at_k": 0.89,
+    "vector_context_precision": 0.47
+  },
+  "answer_quality": {
+    "refusal_precision": 1.0,
+    "refusal_recall": 1.0,
+    "faithfulness": 0.75,
+    "faithfulness_n": 4,
+    "completeness": 1.0,
+    "relevancy": 0.95
+  },
+  "unavailable_count": 3
+}

@@ -7,6 +7,7 @@ How components communicate — specifically, how a client talks to this system. 
 | Endpoint | Purpose | Grounding |
 |---|---|---|
 | `POST /query` | Natural-language question in, grounded answer out | Full pipeline — see [Design: Workflows](../design/workflows.md#query-workflow) |
+| `POST /evaluate` | Question + a desired answer in, real pipeline answer + a lexical comparison out | Same pipeline as `/query`, plus `app/domain/comparison.py` — see [ADR-0030](../adr/0030-interactive-answer-scoring-utility.md) |
 | `GET /entities` | List all ingested entity names | Reads the Structured Index directly, bypasses the LLM entirely |
 | `GET /entities/{name}` | Full attribute/relationship detail for one entity | Reads the Structured Index directly, bypasses the LLM entirely |
 | `GET /health` | Liveness check | No dependencies |

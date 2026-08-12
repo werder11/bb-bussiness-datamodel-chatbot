@@ -6,7 +6,7 @@ Two gates, matched to cost ([ADR-0019](../adr/0019-cicd-pipeline-layered-by-cost
 graph LR
     subgraph Fast["Fast gate — every push — task ci:fast"]
         direction LR
-        L["lint + typecheck"] --> U["Component/Unit tests"] --> I["Component Integration tests"] --> S["System/Acceptance tests\n(template-rendered paths only,\nno LLM calls)"] --> B["Docker build\n(build-only)"]
+        L["lint + typecheck"] --> U["Component/Unit tests"] --> I["Component Integration tests"] --> S["System/Acceptance tests\n(template-rendered paths only,\nno LLM calls)"] --> UI["UI typecheck + build\n(ADR-0025)"] --> B["Docker build\n(build-only)"]
     end
     subgraph Slow["Slow gate — on demand / pre-release — task ci:slow"]
         direction LR
@@ -14,7 +14,7 @@ graph LR
     end
 ```
 
-Both gates are single commands — `task ci:fast` and `task ci:slow` ([Operations: Task Automation](task-automation.md)) — so CI config is a thin wrapper around exactly what a developer can run locally, with no separate CI-only script to drift out of sync.
+Both gates are single commands — `task ci:fast` and `task ci:slow` ([Operations: Task Automation](task-automation.md)) — so CI config is a thin wrapper around exactly what a developer can run locally, with no separate CI-only script to drift out of sync. Implemented as [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml): the fast gate runs on every push/PR; the slow gate is `workflow_dispatch`-only (manually triggered, `gate: slow` input) and uploads `docs/eval-report.md` as a build artifact. The CDM source clone (needed for the Docker build's ingestion step) is sparse-checked-out and cached indefinitely in CI, consistent with [ADR-0008](../adr/0008-cdm-source-version-pinned-at-ingestion.md)'s no-re-fetch-mechanism stance.
 
 No contributor is blocked waiting on or paying for LLM calls to open a PR; the evaluation report stays a real, run artifact (not silently skipped) because it has its own trigger and doesn't compete with the fast gate's speed budget.
 

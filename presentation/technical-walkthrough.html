@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CDM RAG Chatbot — Technical Walkthrough</title>
+<style>
+  :root {
+    --ink: #0b0e14;
+    --panel: #11151f;
+    --panel-2: #161b28;
+    --border: #262c3d;
+    --text: #e7e9f2;
+    --text-dim: #8b91a7;
+    --text-faint: #565d76;
+    --structured: #5b8cff;
+    --traversal: #45c2c2;
+    --semantic: #a78bfa;
+    --neutral: #8890a3;
+    --ok: #3ddc84;
+    --font-display: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Text", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--font-body);
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+
+  .deck {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.75rem, 6vw, 5.5rem);
+    opacity: 0;
+    transform: translateX(16px);
+    transition: opacity 0.32s ease, transform 0.32s ease;
+  }
+
+  .slide.active {
+    display: flex;
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent, var(--text-dim));
+    margin: 0 0 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 1.6rem;
+    height: 1px;
+    background: var(--accent, var(--text-dim));
+    display: inline-block;
+  }
+
+  h1.headline {
+    font-family: var(--font-body);
+    font-weight: 650;
+    font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0 0 1.1rem;
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 62ch;
+    margin: 0 0 1.5rem;
+  }
+
+  .slide-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
+    flex: 1;
+    min-height: 0;
+  }
+
+  .slide-body.single {
+    grid-template-columns: 1fr;
+  }
+
+  .col {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    overflow-y: auto;
+  }
+
+  .point {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.7rem 0.85rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .point .mark {
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    color: var(--ink);
+    background: var(--accent, var(--text-dim));
+    border-radius: 4px;
+    padding: 0.15rem 0.4rem;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    font-weight: 700;
+  }
+
+  .point p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .point p strong { color: var(--text); font-weight: 650; }
+  .point p .dim { color: var(--text-dim); }
+
+  .console {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent, var(--text-dim));
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .console .out { color: var(--text-dim); }
+  .console .hl { color: var(--accent, var(--text)); font-weight: 600; }
+
+  .pipeline {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+  }
+
+  .pipeline .node {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel);
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .pipeline .node.tag-structured { border-color: color-mix(in srgb, var(--structured) 55%, var(--border)); }
+  .pipeline .node.tag-semantic { border-color: color-mix(in srgb, var(--semantic) 55%, var(--border)); }
+  .pipeline .node.tag-traversal { border-color: color-mix(in srgb, var(--traversal) 55%, var(--border)); }
+  .pipeline .node.tag-dim { opacity: 0.55; }
+
+  .pipeline .arrow { color: var(--text-faint); font-size: 0.75rem; }
+
+  .split {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .split .branch {
+    flex: 1;
+    padding: 0.7rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+  }
+
+  .split .branch .label {
+    font-family: var(--font-display);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.35rem;
+  }
+
+  .split .branch.b-structured .label { color: var(--structured); }
+  .split .branch.b-semantic .label { color: var(--semantic); }
+
+  .split .branch p { margin: 0; font-size: 0.82rem; color: var(--text-dim); line-height: 1.45; }
+
+  .scale {
+    position: relative;
+    height: 34px;
+    border-radius: 4px;
+    background: linear-gradient(to right, var(--panel-2) 0%, var(--panel-2) 40%, color-mix(in srgb, var(--semantic) 22%, var(--panel-2)) 40%, color-mix(in srgb, var(--semantic) 22%, var(--panel-2)) 100%);
+    border: 1px solid var(--border);
+    margin: 0.6rem 0 0.3rem;
+  }
+
+  .scale .band {
+    position: absolute;
+    top: 6px;
+    height: 22px;
+    border-radius: 3px;
+  }
+
+  .scale .band-off {
+    left: 6%;
+    width: 18%;
+    background: color-mix(in srgb, var(--neutral) 45%, transparent);
+  }
+
+  .scale .band-on {
+    left: 43%;
+    width: 26%;
+    background: color-mix(in srgb, var(--semantic) 55%, transparent);
+  }
+
+  .scale .cutoff {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    left: 40%;
+    width: 2px;
+    background: var(--text);
+  }
+
+  .scale .cutoff::after {
+    content: "cutoff 0.4";
+    position: absolute;
+    top: -1.35rem;
+    left: 0;
+    transform: translateX(-50%);
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    color: var(--text-faint);
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.5rem 0.8rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    min-width: 6.5rem;
+  }
+
+  .stat .v {
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--accent, var(--text));
+  }
+
+  .stat .l {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    line-height: 1.3;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .kpi {
+    padding: 0.75rem 0.9rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .kpi .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.4rem;
+  }
+
+  .kpi .name { font-size: 0.78rem; color: var(--text); }
+  .kpi .val {
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .kpi .bar-track {
+    height: 5px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .kpi .bar-fill { height: 100%; border-radius: 999px; }
+
+  .closing {
+    margin-top: auto;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    font-size: 1rem;
+    color: var(--text);
+    max-width: 58ch;
+    line-height: 1.55;
+  }
+
+  .closing strong { color: var(--semantic); }
+
+  .footnote {
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    margin-top: 0.6rem;
+  }
+
+  /* Nav chrome */
+  .chrome {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem clamp(1.25rem, 4vw, 3rem);
+    border-top: 1px solid var(--border);
+    background: var(--panel);
+  }
+
+  .chrome-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    color: var(--text-faint);
+  }
+
+  .dots {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .dots button {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    border: none;
+    background: var(--border);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .dots button.on {
+    background: var(--accent-current, var(--text));
+    width: 18px;
+  }
+
+  .nav-btns {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .nav-btns button {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+  }
+
+  .nav-btns button:hover { border-color: var(--text-dim); }
+  .nav-btns button:focus-visible, .dots button:focus-visible {
+    outline: 2px solid var(--semantic);
+    outline-offset: 2px;
+  }
+
+  .nav-btns button:disabled { opacity: 0.3; cursor: default; }
+
+  @media (max-width: 760px) {
+    .slide-body { grid-template-columns: 1fr; overflow-y: auto; }
+    .slide { overflow-y: auto; }
+    .kpi-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- Slide 1 — Frame -->
+  <section class="slide" data-accent="var(--structured)">
+    <p class="eyebrow">01 — Architecture</p>
+    <h1 class="headline">CDM as an external semantic source</h1>
+    <p class="lede">Resolved once into a vendor-independent Canonical Model, then projected two ways — a relational projection for deterministic access, a semantic projection for retrieval over free text. The AI layer sits <em>above</em> this data architecture, called only where semantic interpretation genuinely adds value.</p>
+
+    <div class="slide-body">
+      <div class="col">
+        <div class="pipeline" aria-label="ingestion and query pipeline">
+          <span class="node">CDM source</span><span class="arrow">→</span>
+          <span class="node">Resolver + Validation</span><span class="arrow">→</span>
+          <span class="node">Canonical Model</span>
+        </div>
+        <div class="split">
+          <div class="branch b-structured">
+            <div class="label">Structured projection</div>
+            <p>SQLite. Attributes, single-hop &amp; bounded 2-hop relationships. Deterministic, no model call.</p>
+          </div>
+          <div class="branch b-semantic">
+            <div class="label">Semantic projection</div>
+            <p>ChromaDB. Open-ended questions, one embedding per entity. Model called only here.</p>
+          </div>
+        </div>
+        <div class="pipeline" aria-label="both projections feed the query pipeline">
+          <span class="node tag-structured">Structured</span>
+          <span class="node tag-semantic">Semantic</span>
+          <span class="arrow">→</span>
+          <span class="node">Query Pipeline</span><span class="arrow">→</span>
+          <span class="node tag-semantic">LLM (semantic path only)</span>
+        </div>
+      </div>
+      <div class="col">
+        <div class="point"><span class="mark">WHY</span><p>An LLM invoked for <strong>every</strong> question can't guarantee it never touches parts of the model it wasn't given — routing deterministic questions around it entirely removes that surface.</p></div>
+        <div class="point"><span class="mark">WHY</span><p>Two retrieval shapes exist because two question shapes exist: <span class="dim">"what are X's attributes"</span> is a lookup; <span class="dim">"what covers a customer's financial holdings"</span> is a search.</p></div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><span class="v">44</span><span class="l">entities ingested</span></div>
+      <div class="stat"><span class="v">148</span><span class="l">relationships discovered</span></div>
+      <div class="stat"><span class="v">2</span><span class="l">source namespaces</span></div>
+    </div>
+  </section>
+
+  <!-- Slide 2 — Embedding strategy -->
+  <section class="slide" data-accent="var(--semantic)">
+    <p class="eyebrow">02 — Embedding strategy</p>
+    <h1 class="headline">One chunk per entity, embedded locally, grounded twice</h1>
+
+    <div class="slide-body">
+      <div class="col">
+        <div class="point"><span class="mark">CHUNK</span><p>One chunk <strong>per entity</strong> — name + description + full attribute list + relationship list. Not per-attribute: questions arrive entity-scoped, so retrieval should be too.</p></div>
+        <div class="point"><span class="mark">MODEL</span><p><strong>sentence-transformers / all-MiniLM-L6-v2</strong>, local, CPU-only. No API key, no per-query embedding cost, works offline.</p></div>
+        <div class="point"><span class="mark">STORE</span><p><strong>ChromaDB</strong>, embedded and in-process — no database server, same reasoning already applied to the structured index.</p></div>
+        <div class="point"><span class="mark">GUARD</span><p>Grounded <strong>twice</strong>: a pre-generation similarity cutoff decides if there's evidence at all; a post-generation citation check confirms the model's claims actually appear in what it was given.</p></div>
+      </div>
+      <div class="col">
+        <div class="console"><span class="out">$ semantic_search("Why would a bank need this schema at all?")</span>
+<span class="hl">banking:Bank</span>          0.589  <span class="out">passed</span>
+<span class="hl">banking:FIStandingOrder</span> 0.531  <span class="out">passed</span>
+<span class="hl">banking:FIDirectDebit</span>   0.520  <span class="out">passed</span>
+<span class="hl">banking:Account</span>       0.520  <span class="out">passed</span>
+<span class="hl">banking:Group</span>         0.495  <span class="out">passed</span></div>
+
+        <div>
+          <div class="scale-labels"><span>0.0</span><span>real cosine-similarity scores</span><span>1.0</span></div>
+          <div class="scale"><div class="band band-off"></div><div class="band band-on"></div><div class="cutoff"></div></div>
+          <div class="scale-labels"><span style="color:var(--neutral)">off-topic 0.06–0.24</span><span style="color:var(--semantic)">on-topic 0.43–0.69</span></div>
+        </div>
+
+        <div class="point"><span class="mark">TUNED</span><p>Cutoff <strong>0.4</strong> — set from these real score bands, not guessed. Below it, the pipeline refuses before ever calling the model.</p></div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><span class="v">89%</span><span class="l">Vector Recall@5</span></div>
+      <div class="stat"><span class="v">75%</span><span class="l">Faithfulness</span></div>
+      <div class="stat"><span class="v">95%</span><span class="l">Answer relevancy</span></div>
+    </div>
+  </section>
+
+  <!-- Slide 3 — Relationships -->
+  <section class="slide" data-accent="var(--traversal)">
+    <p class="eyebrow">03 — Data relationships</p>
+    <h1 class="headline">Same name, two different entities — and the 2-hop path the brief itself needed</h1>
+
+    <div class="slide-body">
+      <div class="col">
+        <div class="point"><span class="mark">FOUND</span><p>A real collision in the source data: <strong>banking:Account</strong> (1 attribute) and <strong>crmCommon:Account</strong> (7 attributes, 4 relationships) — same bare name, genuinely different entities.</p></div>
+        <div class="point"><span class="mark">FIX</span><p>Namespace-qualified canonical names. No silent merge, no coin-flip — the system asks, using its own real vocabulary:</p></div>
+        <div class="console"><span class="out">&gt; What are the attributes of Contact?</span>
+That name is ambiguous in the ingested CDM scope —
+did you mean <span class="hl">banking:Contact</span> or <span class="hl">crmCommon:Contact</span>?</div>
+        <div class="point"><span class="mark">BOUND</span><p>Traversal is a plain adjacency-dict BFS, capped at <strong>depth 2</strong>. No graph database, no unbounded walk.</p></div>
+      </div>
+      <div class="col">
+        <p class="lede" style="margin-bottom:0.5rem;font-size:0.85rem;">The brief's own example question, answered for real — 2 hops, not 1:</p>
+        <div class="pipeline" aria-label="real 2-hop traversal path">
+          <span class="node tag-traversal">crmCommon:Contact</span><span class="arrow">→ preferredEquipment →</span>
+          <span class="node tag-traversal">crmCommon:FacilityEquipment</span><span class="arrow">→ organization →</span>
+          <span class="node tag-traversal">crmCommon:Organization</span>
+        </div>
+        <div class="point"><span class="mark">ZERO-HALLUC.</span><p>Structured and traversal hits are <strong>template-rendered</strong>. The model is never called on this path — there is nothing generated, so there is nothing to hallucinate.</p></div>
+        <div class="point"><span class="mark">HONEST</span><p>Per-entity resolution: one bad reference is skipped and logged, not a failed ingestion run. Unresolved references are surfaced, not dropped silently.</p></div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><span class="v">44 / 44</span><span class="l">entities resolved</span></div>
+      <div class="stat"><span class="v">148</span><span class="l">relationships discovered</span></div>
+      <div class="stat"><span class="v">29</span><span class="l">unresolved refs (flagged, out-of-scope)</span></div>
+    </div>
+  </section>
+
+  <!-- Slide 4 — Evidence -->
+  <section class="slide" data-accent="var(--ok)">
+    <p class="eyebrow">04 — Evidence</p>
+    <h1 class="headline">Measured, not asserted</h1>
+    <p class="lede">Each stage — entity matching, structured retrieval, traversal, vector recall, grounding, refusal — is scored independently against a 27-question evaluation set, so a bad answer is traceable to one stage, not a shrug.</p>
+
+    <div class="slide-body single">
+      <div class="col">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="top"><span class="name">Entity-matching accuracy</span><span class="val" style="color:var(--ok)">100%</span></div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--ok)"></div></div></div>
+          <div class="kpi"><div class="top"><span class="name">Structured P / R</span><span class="val" style="color:var(--ok)">100% / 100%</span></div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--ok)"></div></div></div>
+          <div class="kpi"><div class="top"><span class="name">Traversal correctness</span><span class="val" style="color:var(--ok)">100%</span></div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--ok)"></div></div></div>
+          <div class="kpi"><div class="top"><span class="name">Vector Recall@5</span><span class="val" style="color:var(--semantic)">89%</span></div><div class="bar-track"><div class="bar-fill" style="width:89%;background:var(--semantic)"></div></div></div>
+          <div class="kpi"><div class="top"><span class="name">Refusal P / R</span><span class="val" style="color:var(--ok)">100% / 100%</span></div><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--ok)"></div></div></div>
+          <div class="kpi"><div class="top"><span class="name">Faithfulness</span><span class="val" style="color:#f0b93a">75%</span></div><div class="bar-track"><div class="bar-fill" style="width:75%;background:#f0b93a"></div></div></div>
+        </div>
+        <p class="footnote">Faithfulness / relevancy scored only on questions that reached generation (the semantic route) — deterministic routes never touch the model, so they're excluded from those two by construction. Full breakdown: docs/eval-report.md.</p>
+      </div>
+    </div>
+
+    <p class="closing">reeeliance's own framing is "AI Readiness" — moving from heterogeneous data to standardized, semantic models. <strong>That readiness has to exist before the model is ever called</strong> — a schema resolved cleanly, relationships bounded and correct, retrieval measured stage by stage. The model is the last step, not the foundation.</p>
+  </section>
+
+</div>
+
+<div class="chrome">
+  <div class="chrome-left">
+    <span id="slide-counter">1 / 4</span>
+    <div class="dots" id="dots" role="tablist" aria-label="Slides"></div>
+  </div>
+  <div class="nav-btns">
+    <button id="prev-btn" type="button" aria-label="Previous slide">← Prev</button>
+    <button id="next-btn" type="button" aria-label="Next slide">Next →</button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+    var dotsContainer = document.getElementById("dots");
+    var counter = document.getElementById("slide-counter");
+    var prevBtn = document.getElementById("prev-btn");
+    var nextBtn = document.getElementById("next-btn");
+    var current = 0;
+
+    slides.forEach(function (slide, i) {
+      var dot = document.createElement("button");
+      dot.type = "button";
+      dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+      dot.addEventListener("click", function () { go(i); });
+      dotsContainer.appendChild(dot);
+    });
+
+    function go(i) {
+      if (i < 0 || i >= slides.length) return;
+      current = i;
+      slides.forEach(function (slide, idx) {
+        slide.classList.toggle("active", idx === current);
+        if (idx === current) {
+          var accent = slide.getAttribute("data-accent");
+          document.documentElement.style.setProperty("--accent-current", accent);
+          slide.style.setProperty("--accent", accent);
+        }
+      });
+      Array.prototype.forEach.call(dotsContainer.children, function (dot, idx) {
+        dot.classList.toggle("on", idx === current);
+      });
+      counter.textContent = (current + 1) + " / " + slides.length;
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === slides.length - 1;
+    }
+
+    prevBtn.addEventListener("click", function () { go(current - 1); });
+    nextBtn.addEventListener("click", function () { go(current + 1); });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(current + 1); }
+      if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(current - 1); }
+      if (e.key === "Home") { e.preventDefault(); go(0); }
+      if (e.key === "End") { e.preventDefault(); go(slides.length - 1); }
+    });
+
+    go(0);
+  })();
+</script>
+</body>
+</html>

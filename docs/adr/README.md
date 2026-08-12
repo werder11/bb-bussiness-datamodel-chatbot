@@ -27,8 +27,15 @@ Structural/shape-level architecture decisions for the reeeliance Business Data M
 | [0019](0019-cicd-pipeline-layered-by-cost-and-speed.md) | CI/CD Pipeline Layered by Cost and Speed | Accepted | 2026-08-11 |
 | [0020](0020-task-automation-modular-taskfiles.md) | Task Automation via Modular Taskfiles | Accepted | 2026-08-11 |
 | [0021](0021-schema-based-design-at-port-boundaries.md) | Schema-Based Design at Every Port Boundary | Accepted | 2026-08-11 |
-| [0022](0022-ui-layer-deferred-future-scope.md) | UI Layer Deferred to Future Scope | Accepted | 2026-08-11 |
+| [0022](0022-ui-layer-deferred-future-scope.md) | UI Layer Deferred to Future Scope | **Superseded** by 0025 | 2026-08-11 |
 | [0023](0023-tech-layer-adapters.md) | Tech-Layer Adapters — ChromaDB, Anthropic Claude, sentence-transformers, per-entity chunking | Accepted | 2026-08-11 |
+| [0024](0024-second-llm-provider-gemini.md) | Add Google Gemini as a Second, Swappable LLM Provider | Accepted | 2026-08-11 |
+| [0025](0025-ui-typescript-chat-and-entity-browser.md) | UI — TypeScript Chat + Entity Browser, Statically Served by FastAPI | Accepted (supersedes 0022) | 2026-08-11 |
+| [0026](0026-eval-kpi-snapshot-in-ui.md) | Evaluation KPI Snapshot in the UI — Build-Time, Not Live | Accepted | 2026-08-12 |
+| [0027](0027-pipeline-view-derived-client-side.md) | Pipeline View — Reconstructed Client-Side, Not a New API Field | Accepted | 2026-08-12 |
+| [0028](0028-pipeline-zoom-view-server-side-debug-payload.md) | Pipeline Zoom View — a Real `debug` Payload, Not More Client-Side Guessing | Accepted | 2026-08-12 |
+| [0029](0029-playwright-e2e-tests.md) | Playwright E2E Tests — Real Browser, No LLM Credentials Required | Accepted | 2026-08-12 |
+| [0030](0030-interactive-answer-scoring-utility.md) | Interactive "Score an Answer" Utility — Real Pipeline, Lexical Comparison, No External Eval Framework | Accepted | 2026-08-12 |
 
 ## Decision Graph (Reading Order)
 
@@ -42,8 +49,15 @@ The ADRs build on each other roughly in this dependency order, not strictly nume
 6. **Answer construction**: 0013 (superseded) → 0016 (template vs. LLM split)
 7. **Quality assurance**: 0018 (testing) and 0017 (evaluation) — deliberately distinct disciplines, see 0017's Context for why
 8. **Delivery mechanics**: 0020 (task runner) → 0019 (CI/CD gates built on it)
-9. **Future scope**: 0022 (UI) — accepted as a deferral, not built
+9. ~~**Future scope**: 0022 (UI) — accepted as a deferral, not built~~ — superseded by 0025, same day
 10. **Tech adapters**: 0023 (vendor picks behind 0001's ports) — the last decision before implementation could start
+11. **Provider swap**: 0024 (Gemini as a second LLM adapter) — a post-implementation decision, exercising 0001's port boundary rather than changing it
+12. **UI**: 0025 (TypeScript chat + entity browser, statically served) — a post-implementation decision, the thin client 0022 had pre-scoped, actually built
+13. **UI + evaluation**: 0026 (KPI snapshot in the UI) — connects 0025's UI to 0017's evaluation layer, deliberately build-time rather than live to stay within both 0025's "thin client" constraint and 0024's free-tier quota limits
+14. **UI + pipeline visibility**: 0027 (pipeline view) — same "stay within the thin-client constraint" instinct as 0026, applied to per-query stage tracing instead of aggregate KPIs
+15. **UI + pipeline zoom**: 0028 (per-stage debug payload) — the one place this project deliberately crosses the thin-client line 0025/0027 hold everywhere else, because the alternative is data that cannot be recovered any other way
+16. **E2E verification**: 0029 (Playwright) — the first automated check of everything 0025-0028 built, closing the "not verified in an actual browser" caveat every one of those ADRs left open
+17. **UI + interactive evaluation**: 0030 (score-an-answer utility) — completes the early-session evaluation discussion 0026 partially answered (static KPI snapshot); reuses 0028's zoom-view and 0025's pipeline wiring rather than introducing a new evaluation code path
 
 ## Creating a New ADR
 

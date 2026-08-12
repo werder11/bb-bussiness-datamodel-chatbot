@@ -15,5 +15,18 @@ cdm-source/
 # Claude Code tooling/skills used to build this repo — not part of the deliverable source
 .claude/
 
+# implementation-planner's working artifacts (research/plan/context/task-checklist) —
+# same "how it was built" category as .claude/, kept locally, not in the deliverable repo
+.docs/
+
 # Superseded working drafts, fully migrated into docs/ — kept locally, not in the deliverable repo
 temp/
+
+# UI (ADR-0025) — built by `task ui:build`/the Docker frontend stage, not committed
+ui/node_modules/
+ui/dist/
+
+# Playwright E2E (ADR-0029) — run artifacts, not source
+ui/test-results/
+ui/playwright-report/
+ui/blob-report/

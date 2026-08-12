@@ -1,0 +1,26 @@
+{
+  "jsonSchemaSemanticVersion": "1.4.0",
+  "definitions": [
+    {
+      "entityName": "Account",
+      "extendsEntity": "base_Account/Account",
+      "description": "CRM Account, extending an unresolvable CDS base shape.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {
+                "entity": {
+                  "entityReference": "Lead"
+                },
+                "name": "originatingLead"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "documentVersion": "1.4"
+}

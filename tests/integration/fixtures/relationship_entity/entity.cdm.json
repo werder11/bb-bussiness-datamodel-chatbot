@@ -1,0 +1,46 @@
+{
+  "jsonSchemaSemanticVersion": "1.0.0",
+  "definitions": [
+    {
+      "entityName": "Relationship",
+      "extendsEntity": "CdmEntity",
+      "description": "Denotes an association between one contact and another, e.g. spouse, lawyer, child.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {
+                "name": "ContactFrom",
+                "description": "The contact who owns the relationship.",
+                "isNullable": true,
+                "purpose": "hasA",
+                "dataType": "entityId",
+                "entity": {
+                  "source": "Contact",
+                  "operations": [
+                    { "$type": "replaceAsForeignKey", "condition": "referenceOnly", "reference": "contactId" }
+                  ]
+                }
+              },
+              {
+                "name": "ContactTo",
+                "description": "The contact with whom the relationship is established.",
+                "isNullable": true,
+                "purpose": "hasA",
+                "dataType": "entityId",
+                "entity": {
+                  "source": "Contact",
+                  "operations": [
+                    { "$type": "replaceAsForeignKey", "condition": "referenceOnly", "reference": "contactId" }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "documentVersion": "1.0"
+}

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CDM RAG Chatbot</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <aside id="entity-panel">
+        <h1>CDM Entities</h1>
+        <input id="entity-filter" type="search" placeholder="Filter entities..." autocomplete="off" />
+        <ul id="entity-list" aria-label="Entities"></ul>
+      </aside>
+
+      <main id="chat-panel">
+        <header>
+          <h1>CDM RAG Chatbot</h1>
+          <p class="subtitle">Ask about the Microsoft CDM Banking Model — grounded in the ingested schema, never guessed.</p>
+          <div class="header-buttons">
+            <button id="info-button" type="button">ⓘ How this works</button>
+            <button id="eval-button" type="button">📊 Evaluation</button>
+            <button id="evaluate-button" type="button">🧪 Score an answer</button>
+            <button id="pipeline-toggle" type="button" aria-pressed="false">🔬 Pipeline view</button>
+          </div>
+        </header>
+
+        <div id="messages" aria-live="polite"></div>
+
+        <div id="sample-queries" aria-label="Sample queries"></div>
+
+        <form id="query-form">
+          <input
+            id="question-input"
+            type="text"
+            placeholder="e.g. What are the attributes of banking:Account?"
+            autocomplete="off"
+            required
+          />
+          <button type="submit">Ask</button>
+        </form>
+      </main>
+
+      <aside id="detail-panel" hidden>
+        <button id="detail-close" aria-label="Close">×</button>
+        <div id="detail-content"></div>
+      </aside>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

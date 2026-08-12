@@ -1,6 +1,6 @@
 # Components
 
-What's inside the Ingestion and API containers ([Containers](containers.md)). This is the full request/ingestion-time view; boxes marked `(tech TBD)` are ports whose concrete adapter is chosen in the tech-decision pass ([`FINDINGS.md §7`](../../FINDINGS.md#7-open-architecture-decisions)), not here. The [Quality](../quality/README.md) and [Operations](../operations/README.md) layers that surround this diagram are documented separately.
+What's inside the Ingestion and API containers ([Containers](containers.md)). This is the full request/ingestion-time view; concrete adapter tech is chosen in [ADR-0023](../adr/0023-tech-layer-adapters.md) (ChromaDB, sentence-transformers, per-entity chunking) and [ADR-0024](../adr/0024-second-llm-provider-gemini.md) (Anthropic/Gemini, swappable via `LLM_PROVIDER`). The [Quality](../quality/README.md) and [Operations](../operations/README.md) layers that surround this diagram are documented separately.
 
 ```mermaid
 graph TD
@@ -9,12 +9,12 @@ graph TD
         Resolver --> Validate["Validation Pass\nduplicate entities · unresolved references\ninvalid relationships · missing identifiers\n→ produces ingestion summary report"]
         Validate --> Canonical["Canonical CDM Semantic Model\nEntity / Attribute / Relationship / Trait\n+ provenance (source_path, source_commit)\nvendor-independent domain core\n(schema-typed, ADR-0021)"]
         Canonical --> RelWriter["Relational Projection writer\n(idempotent: clear-then-write)"]
-        Canonical --> SemWriter["Semantic Projection writer\n(tech TBD: chunking + embedder)"]
+        Canonical --> SemWriter["Semantic Projection writer\nper-entity chunking + sentence-transformers"]
     end
 
     subgraph Stores["Retrieval Stores"]
-        RelWriter --> SqlIdx[("Relational / Structured Index\nembedded (tech TBD: SQLite)")]
-        SemWriter --> VecIdx[("Semantic / Vector Index\n(tech TBD)")]
+        RelWriter --> SqlIdx[("Relational / Structured Index\nembedded: SQLite")]
+        SemWriter --> VecIdx[("Semantic / Vector Index\nembedded: ChromaDB")]
     end
 
     subgraph Online["API Container"]
@@ -33,11 +33,11 @@ graph TD
         Evidence --> Guard["Grounding Guard\nstructured/traversal: hit found? (boolean)\nvector: score ≥ cutoff?"]
         Guard -->|"no hit / below cutoff"| Refuse["Fixed refusal:\n'not found in ingested CDM scope'"]
         Guard -->|"deterministic evidence only"| Template["Deterministic Answer\ntemplate render — zero LLM"]
-        Guard -->|"semantic or mixed evidence"| Gen["LLM Generation\ncontext-only (tech TBD)"]
+        Guard -->|"semantic or mixed evidence"| Gen["LLM Generation\ncontext-only, Anthropic or Gemini (ADR-0024)"]
         Template --> Validator["Grounding Validator\ncited names must appear in context"]
         Gen --> Validator
         Validator -->|"unsupported claim"| Refuse
-        Validator -->|"passes"| Trace["Retrieval Tracer\n{query, matched_entities, route, grounded, verified}"]
+        Validator -->|"passes"| Trace["Retrieval Tracer\n{query, matched_entities, route, grounded, verified, error}"]
         Refuse --> Trace
         Trace --> Resp["Response"]
         Resp --> Client
@@ -59,7 +59,7 @@ Supporting read-only endpoints (`GET /entities`, `GET /entities/{name}`, `GET /h
 | Bounded Graph Traversal | Depth-≤2 relationship resolution | [0009](../adr/0009-relationship-traversal-bounded-to-depth-2.md) |
 | Grounding Guard | Pre-generation check: is there anything to ground on? | [0005](../adr/0005-explicit-grounding-guard-before-generation.md) |
 | Deterministic Answer (Template) | Zero-LLM rendering for fully-structured hits | [0016](../adr/0016-deterministic-hits-template-rendered.md) |
-| LLM Generation | Context-only synthesis for semantic/mixed evidence | [0001](../adr/0001-hexagonal-architecture-ports-and-adapters.md) (port), [0016](../adr/0016-deterministic-hits-template-rendered.md) |
+| LLM Generation | Context-only synthesis for semantic/mixed evidence | [0001](../adr/0001-hexagonal-architecture-ports-and-adapters.md) (port), [0016](../adr/0016-deterministic-hits-template-rendered.md), [0023](../adr/0023-tech-layer-adapters.md)/[0024](../adr/0024-second-llm-provider-gemini.md) (adapters) |
 | Grounding Validator | Post-generation citation check | [0010](../adr/0010-post-generation-grounding-verification.md) |
 | Retrieval Tracer | Structured log per query, for demo/debug evidence | See [Operations: Monitoring](../operations/monitoring.md) |
 

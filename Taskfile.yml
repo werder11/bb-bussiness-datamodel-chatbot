@@ -10,6 +10,7 @@ includes:
   eval: tasks/eval.yml
   docker: tasks/docker.yml
   ci: tasks/ci.yml
+  ui: tasks/ui.yml
 
 tasks:
   default:
