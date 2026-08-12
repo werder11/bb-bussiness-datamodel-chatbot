@@ -88,5 +88,7 @@ A sixth, UI-side level lives in `ui/tests/e2e/` — Playwright against a real br
 
 ## Presentation
 
+Live, rendered — no download needed: **https://werder11.github.io/bb-bussiness-datamodel-chatbot/** (`.github/workflows/pages.yml` publishes `presentation/` on every push that touches it; requires the one-time repo Settings → Pages → Source → "GitHub Actions" toggle).
+
 - [`presentation/technical-walkthrough.html`](presentation/technical-walkthrough.html) — the brief's required 4-slide technical walkthrough (embedding strategy + how relationships were handled), self-contained and arrow-key navigable; open it directly in a browser, no build step. Every number and quote on it comes from actually running the code against the real corpus — the KPI slide mirrors `docs/eval-report.md` (gitignored by default; run `task eval:run` to regenerate it, or un-gitignore it if you want the committed repo to include the exact numbers shown).
 - [`presentation/self-intro.html`](presentation/self-intro.html) — the brief's required self-intro slide ("How do I see myself as a Senior Data & AI Architect at reeeliance?"), same visual system as the technical walkthrough. Strengths, experience, and role evolution, each grounded in real resume/reference-letter facts rather than generic claims.
